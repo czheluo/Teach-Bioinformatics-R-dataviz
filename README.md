@@ -1,2 +1,2 @@
 # tech-R-bioinformatics
-Materials for "Teaching the R plot" june 2019  in Majorbio
+Materials for "Teaching the basic R " june 2019  in Majorbio
