@@ -1,12 +1,12 @@
-###  WORKSHOP Overview <a href=""><img src="outline.png" align="right" alt="logo" height="57" width="80" /></a> <pre> 
+###  WORKSHOP Overview <a href=""><img src="Fig/outline.png" align="right" alt="logo" height="57" width="80" /></a>
 
 ### Big Data and Data Science using R for researchers 
  This is a short course for Rstat and Rdataviz. Mainly is designed to provide a good opportunity for researchers to learn R (An interactive approach to statistical computing). Specifically designed for data analysis and graphics (ggplot2) and the visual analysis of the results related to transcriptome analysis (volcano plot, bubble plot, complexheatmap (go enrichment Set analysis, kegg analysis (pathsway analysis)) and venn graph). Statistical genomics (biometric models) to be included in later courses (eg: GWAS (EWAS and TWAS)). Looking forward to meetting you at majorbio in shanghai. 
  ### Location
- <br>
-		<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3416.2558021437867!2d121.62565031548901!3d31.102621574761713!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x35b278a7530eb1dd%3A0xb40b78f5079ac68b!2sCentury+Medicine+Park!5e0!3m2!1sen!2sus!4v1531624183346" width="600" height="450" frameborder="0" style="border:0" allowfullscreen></iframe>
-		<br>
-		<br>
+ 
+<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3416.2558021437867!2d121.62565031548901!3d31.102621574761713!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x35b278a7530eb1dd%3A0xb40b78f5079ac68b!2sCentury+Medicine+Park!5e0!3m2!1sen!2sus!4v1531624183346" width="600" height="450" frameborder="0" style="border:0" allowfullscreen></iframe>
+
+
 
 ### Schedule
 
@@ -70,7 +70,7 @@ EnhancedVolcano(expres,lab = rownames(expres),
                 gridlines.minor = FALSE)
 dev.off()
 ```
-<img src="human.vol.png" width="80%" alt="npg">
+<img src="Fig/human.vol.png" width="80%" alt="npg">
 
 ## PCA
 ```r
@@ -110,7 +110,7 @@ p <- p + geom_point() + theme + xlab(percentage[1]) + ylab(percentage[2]) +
 p
 
 ```
-<img src="pca.png" width="80%" alt="pca">
+<img src="Fig/pca.png" width="80%" alt="pca">
 
 ## complexheatmap
 ```r
@@ -129,7 +129,7 @@ Heatmap(mmmat,
 
 dev.off()
 ```
-<img src="complexheatmap.png" width="100%" alt="pca">
+<img src="Fig/complexheatmap.png" width="100%" alt="heatmap">
 
 ## Supervenn
 ```r
@@ -180,7 +180,7 @@ showSVG(myV4, opacity = 0.8, systemShow = T)
 
 
 ```
-<img src="venn.png" width="70%" alt="venn">
-<img src="upset.png" width="70%" alt="venn">
-<img src="mnVR.png" width="70%" alt="venn">
+<img src="Fig/venn.png" width="70%" alt="venn">
+<img src="Fig/upset.png" width="70%" alt="venn">
+<img src="Fig/mnVR.png" width="70%" alt="venn">
 
