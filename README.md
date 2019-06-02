@@ -1,4 +1,4 @@
-###  WORKSHOP Overview <a href=""><img src="Fig/outline.png" align="right" alt="logo" height="570" width="800" /></a> <pre> 
+###  WORKSHOP Overview <a href=""><img src="Fig/outline.png" align="right" alt="logo" height="157" width="400" /></a> <pre> 
 
 ### Big Data and Data Science using R for researchers 
  This is a short course for Rstat and Rdataviz. Mainly is designed to provide a good opportunity for researchers to learn R (An interactive approach to statistical computing). Specifically designed for data analysis and graphics (ggplot2) and the visual analysis of the results related to transcriptome analysis (volcano plot, bubble plot, complexheatmap (go enrichment Set analysis, kegg analysis (pathsway analysis)) and venn graph). Statistical genomics (biometric models) to be included in later courses (eg: GWAS (EWAS and TWAS)). Looking forward to meetting you at majorbio in shanghai. 
