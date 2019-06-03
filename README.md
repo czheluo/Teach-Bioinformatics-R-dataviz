@@ -17,6 +17,10 @@
 | Transcriptome analysis procedure I (QC, Assembly(noref), Mapping and RSEM) | 08:30 - 12:00 | 06.14
 | Transcriptome analysis procedure II (DE (edgeR), PCA and (GO, KEGG) set analysis)  | 13:30 - 17:30 | 06.14
 
+### Pipeline (reference)
+
+<div align="center"><a href="https://f1000research.com/articles/5-1574/v1"><img src="Fig/pipeline.gif" width="50%" alt="pca"></div> 
+
 ### Contact Me:
 > [meng.luo@majorbio.com](Meng Luo) OR [czheluo@gmail.com](Chenzhe Luo) 
 
