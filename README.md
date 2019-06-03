@@ -19,7 +19,9 @@
 
 ### Pipeline (reference)
 
-<div align="center"><a href="https://f1000research.com/articles/5-1574/v1"><img src="Fig/pipeline.gif" width="50%" alt="pca"></div> 
+<div align="center">
+<a href="https://f1000research.com/articles/5-1574/v1"><img src="Fig/pipeline.gif" width="50%" alt="pca">
+</div> 
 
 ### Contact Me:
 > [meng.luo@majorbio.com](Meng Luo) OR [czheluo@gmail.com](Chenzhe Luo) 
