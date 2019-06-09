@@ -4,6 +4,9 @@
 #  contact: meng.luo@majorbio.com
 ##########################################
 
+
+set.seed(0614)
+
 # require packages
 library(ggplot2)
 library(scales)
@@ -11,137 +14,116 @@ library(gridExtra)
 library(RColorBrewer)
 color <- grDevices::colors()[grep("gr(a|e)y", grDevices::colors(), invert = T)]
 rcolor <- color[sample(1:length(color), length(color))]
-
+library(EnhancedVolcano)
 # setting data director
 
-setwd("G:\\MAJORBIO\\R Course\\Intro\\data")
+expres <- read.table("VC_24h_vs_AZ_24h.deseq2.xls", sep = "\t", header = T)
 
-expres <- read.table("VC_24h_vs_AZ_24h.deseq2.xls",sep="\t",header = T)
-# load("expres.rds")
-cols <- c("yes" = "red", "no" = "orange", "nonsignificant" = "darkgrey", "up" = "#00B2FF", "down" = "#00B2FF")
-
-vol <- ggplot(expres, aes(x = log2fc, y = -log10(padjust),fill = significant, labels=seq_id))
-
-p <- vol + ggtitle(label = "Volcano Plot") +
-  #scale_colour_manual(values = cols) +
-  geom_point(size = 2.5, alpha = 1, na.rm = T, shape = 21, colour = "black") +
+cols <- c("yes" = "red", "no" = "orange", "nosig" = "darkgrey", "up" = "#00B2FF", "down" = "#00B2FF")
+# scatter plot
+vol <- ggplot(expres, aes(
+  x = log10(VC_24h_tpm),
+  y = log10(AZ_24h_tpm),
+  color = regulate
+))
+vol + geom_point(size = 2.5) +
+  # xlim(c(0,5))+ylim(c(0,5))
+  scale_colour_manual(values = c("#00B2FF", "darkgrey", "orange")) +
   theme_bw(base_size = 14) + # change overall theme
   theme(legend.position = "right") + # change the legend
-  xlab(expression("Log2FC")) + # Change X-Axis label
-  ylab(expression(-log[10]("FDR"))) + # Change Y-Axis label
-  #geom_hline(yintercept = 1, colour="#990000", linetype="dashed") +
-  geom_vline(xintercept = 2, colour="#990000", linetype="dashed") +
-  geom_vline(xintercept = -2, colour="#990000", linetype="dashed") #+ # Add p-adj value cutoff line
-  #scale_y_continuous(trans = "log1p") # Scale yaxis due to large p-values
+  xlab(expression("Log10(VC_24h)")) + # Change X-Axis label
+  ylab(expression("log10(AZ_24h)")) # Change Y-Axis label
 
-#vol+scale_fill_npg()
-#p+scale_color_aaas()
-  
-  expres$v24<-log10(rowMeans(expres[,c(8:10)]))
-  expres$av24<-log10(rowMeans(expres[,c(11:13)]))#significant
-  vol <- ggplot(expres, aes(x =log10(VC_24h_tpm), y = log10(AZ_24h_tpm),fill = regulate, labels=seq_id))
-  
-  vol + #ggtitle(label = "Volcano Plot", subtitle = "Colored by fold-change direction") +
-    scale_colour_manual(values = cols) +
-    geom_point(size = 2.5, alpha = 1, na.rm = T,shape = 21, colour = "white") +
-    theme_bw(base_size = 14) + # change overall theme
-    theme(legend.position = "right") + # change the legend
-    xlab(expression("Log10(VC_24h)")) + # Change X-Axis label
-    ylab(expression("log10(AZ_24h)")) + # Change Y-Axis label
-    xlim(c(0,5))+ylim(c(0,5))+
-    #geom_hline(yintercept = 1, colour="#990000", linetype="dashed") +
-    #geom_vline(xintercept = 1, colour="#990000", linetype="dashed") +
-    #geom_vline(xintercept = -1, colour="#990000", linetype="dashed") #+ # Add p-adj value cutoff line
-  scale_y_continuous(trans = "log1p") # Scale yaxis due to large p-values
-  
+# VOLCANO
+vol <- ggplot(expres, aes(x = log2fc, y = -log10(padjust)))
 
+vol + geom_point()
 
-if (!requireNamespace('BiocManager', quietly = TRUE))
-    install.packages('BiocManager')
-BiocManager::install('EnhancedVolcano')
-BiocManager::install('airway')
-library(EnhancedVolcano)
-library(airway)
-library(magrittr)
+vol + geom_point(color = "red")
 
-data('airway')
-airway$dex %<>% relevel('untrt')
+vol + geom_point(aes(color = "red"))
 
-if (!requireNamespace("BiocManager", quietly = TRUE))
-  install.packages("BiocManager")
+vol + geom_point(aes(color = regulate))
 
-BiocManager::install("DESeq2")
-library('DESeq2')
+volcano <- vol + geom_point(aes(color = regulate)) + xlim(-4, 4) + ylim(0, 310)
 
-dds <- DESeqDataSet(airway, design = ~ cell + dex)
-dds <- DESeq(dds, betaPrior=FALSE)
-res1 <- results(dds,
-                contrast = c('dex','trt','untrt'))
-res1 <- lfcShrink(dds,
-                  contrast = c('dex','trt','untrt'), res=res1)
-res2 <- results(dds,
-                contrast = c('cell', 'N061011', 'N61311'))
-res2 <- lfcShrink(dds,
-                  contrast = c('cell', 'N061011', 'N61311'), res=res2)
-EnhancedVolcano(res1,
-                lab = rownames(res1),
-                x = 'log2FoldChange',
-                y = 'pvalue',
-                xlim = c(-5, 8))
-head(res1)
-EnhancedVolcano(expres,lab = rownames(expres),
-                x= 'log2fc',
-                y= 'padjust',
+volcano + labs(title = "Volcanoplot", x = "log2(FC)")
+
+volcano + labs(
+  title = "Volcanoplot", x = expression(log[2](FC)),
+  y = expression(-log[10](FDR))
 )
-png(paste("huamn.vol",".png",sep=""),width=1000, height=800)
-EnhancedVolcano(expres,lab = rownames(expres),
-                x= 'log2fc',
-                y= 'padjust',
-               # xlim = c(-6, 6),
-                selectLab="",
-                title = "",
-                pCutoff = 10e-12,
-                FCcutoff = 1,
-                xlab = "Log2FC",
-                transcriptPointSize = 1.5,
-                transcriptLabSize = 3.0,
-                colAlpha = 1,
-                cutoffLineType = 'blank',
-                cutoffLineCol = 'black',
-                cutoffLineWidth =1,
-                legendLabSize = 14, 
-                legendIconSize = 4,
-                transcriptPointSize =2, #c(1.6,1.6,1.6,1.6), 
-                transcriptLabSize = 3, #c(4,4,4,4), 
-                #hline = c(10e-12, 10e-36, 10e-60, 10e-84),
-                #hlineCol = c('grey0', 'grey25','grey50','grey75'),
-                #hlineType = 'longdash',
-                #hlineWidth = 0.8,
-                gridlines.major = FALSE,
-                gridlines.minor = FALSE)
+
+volcanop <- volcano + labs(
+  title = "Volcanoplot", x = expression(log[2](FC)),
+  y = expression(-log[10](FDR))
+)
+
+volcanop + scale_color_manual(values = c("green", "black", "red"))
+
+volcanor <- volcanop + scale_color_manual(values = c("#00ba38", "#619cff", "#f8766d"))
+volcanor + geom_hline(yintercept = 13) + geom_vline(xintercept = c(-1, 1))
+
+volcanor + geom_hline(yintercept = 12, linetype = 4) + geom_vline(xintercept = c(-1, 1), linetype = 4)
+
+ggsave("volcano.png")
+ggsave("volcano8.png", volcano, width = 8, height = 8)
+
+## R packages
+
+png(paste("huamn.vol", ".png", sep = ""), width = 1000, height = 800)
+EnhancedVolcano(expres,
+  lab = rownames(expres),
+  x = "log2fc",
+  y = "padjust",
+  # xlim = c(-6, 6),
+  selectLab = "",
+  title = "",
+  pCutoff = 10e-12,
+  FCcutoff = 1,
+  xlab = "Log2FC",
+  transcriptPointSize = 1.5,
+  transcriptLabSize = 3.0,
+  colAlpha = 1,
+  cutoffLineType = "blank",
+  cutoffLineCol = "black",
+  cutoffLineWidth = 1,
+  legendLabSize = 14,
+  legendIconSize = 4,
+  # transcriptPointSize =2, #c(1.6,1.6,1.6,1.6),
+  # transcriptLabSize = 3, #c(4,4,4,4),
+  # hline = c(10e-12, 10e-36, 10e-60, 10e-84),
+  # hlineCol = c('grey0', 'grey25','grey50','grey75'),
+  # hlineType = 'longdash',
+  # hlineWidth = 0.8,
+  gridlines.major = FALSE,
+  gridlines.minor = FALSE
+)
 dev.off()
-pdf(paste("human.pc",".pdf",sep=""),height=9,width=16)
-EnhancedVolcano(expres,lab = rownames(expres),
-                x= 'log2fc',
-                y= 'padjust',
-                # xlim = c(-6, 6),
-                selectLab="",
-                title = "",
-                pCutoff = 10e-12,
-                FCcutoff = 1,
-                xlab = "Log2FC",
-                transcriptPointSize = 1.5,
-                transcriptLabSize = 3.0,
-                colAlpha = 1,
-                cutoffLineType = 'blank',
-                cutoffLineCol = 'black',
-                cutoffLineWidth =1,
-                legendLabSize = 14, 
-                legendIconSize = 4,
-                #hline = c(10e-12, 10e-36, 10e-60, 10e-84),
-                #hlineCol = c('grey0', 'grey25','grey50','grey75'),
-                #hlineType = 'longdash',
-                #hlineWidth = 0.8,
-                gridlines.major = FALSE,
-                gridlines.minor = FALSE)
+pdf(paste("human.vol", ".pdf", sep = ""), height = 9, width = 16)
+EnhancedVolcano(expres,
+  lab = rownames(expres),
+  x = "log2fc",
+  y = "padjust",
+  # xlim = c(-6, 6),
+  selectLab = "",
+  title = "",
+  pCutoff = 10e-12,
+  FCcutoff = 1,
+  xlab = "Log2FC",
+  transcriptPointSize = 1.5,
+  transcriptLabSize = 3.0,
+  colAlpha = 1,
+  cutoffLineType = "blank",
+  cutoffLineCol = "black",
+  cutoffLineWidth = 1,
+  legendLabSize = 14,
+  legendIconSize = 4,
+  # hline = c(10e-12, 10e-36, 10e-60, 10e-84),
+  # hlineCol = c('grey0', 'grey25','grey50','grey75'),
+  # hlineType = 'longdash',
+  # hlineWidth = 0.8,
+  gridlines.major = FALSE,
+  gridlines.minor = FALSE
+)
 dev.off()

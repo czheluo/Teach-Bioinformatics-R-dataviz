@@ -4,6 +4,8 @@
 #  contact: meng.luo@majorbio.com
 ##########################################
 
+set.seed(0613)
+
 # require packages
 library(ggplot2)
 library(scales)
@@ -17,9 +19,11 @@ data("mtcars")
 df <- mtcars
 
 # Convert cyl as a grouping variable
+
 df$cyl <- as.factor(df$cyl)
 
 # Inspect the data
+
 head(df[, c("wt", "mpg", "cyl", "qsec")], 4)
 
 ggplot(df, aes(x = wt, y = mpg)) +
@@ -28,35 +32,63 @@ ggplot(df, aes(x = wt, y = mpg)) +
   scale_size(range = c(0.5, 12)) # Adjust the range of points size
 
 # Color and shape depend on factor (categorical variable)
+
 ggplot(iris, aes(
   x = Sepal.Length, y = Sepal.Width, color = Petal.Length,
   size = Petal.Length
 )) +
   geom_point(alpha = 0.6)
 
+
 # setting data director
+# setwd()
 
 go <- read.csv("goenrich.csv", header = T)
 
 head(go)
 
-ggplot(go, aes(
-  x = richfactor, y = Description, color = Petal.Length,
-  size = Petal.Length
-)) +
-  geom_point(alpha = 0.6)
-tw <- go[c(1:20), ]
-ggplot(tw, aes(x = richfactor, y = Description)) +
-  geom_point(aes(color = Pvalue_corrected, size = Number), alpha = 0.5) # +
-# scale_color_manual(values = c("#00AFBB", "#E7B800", "#FC4E07")) +
-# scale_size(range = c(0.5, 12))  # Adjust the range of points size
+tw <- go[sample(c(1:25)), ]
 
 # for finding the font in our computer
-windowsFonts()
+# windowsFonts()
+
 ## BUDDLE PLOT
-ggplot(tw, aes(x = richfactor, y = Description)) +
-  geom_point(aes(color = Pvalue_corrected, size = Number), alpha = 1) +
+p <- ggplot(tw, aes(x = richfactor, y = Description, color = Pvalue_corrected, size = Number)) +
+  geom_point(alpha = 1) +
   scale_color_gradient(low = "black", high = "red") +
+  theme(
+    legend.position = "right",
+    axis.text = element_text(
+      family = "serif",
+      size = 10, face = "bold"
+    ),
+    legend.text = element_text(
+      family = "serif",
+      size = 10, face = "bold"
+    ),
+    legend.title = element_text(
+      family = "serif",
+      size = 10, face = "bold"
+    ),
+    # panel.grid.major = element_blank(),
+    # panel.grid.minor = element_blank(),
+    # panel.background = element_blank(),
+    axis.line = element_line(colour = "black")
+  ) +
+  labs(size = "Number of Genes", colour = "FDR") +
+  ylab(NULL) + xlab("Rich Factor")
+
+# facet
+facet_grid(~Term.Type, scales = "free_y")
+
+# save image
+png(paste("bubble", ".png", sep = ""), width = 1000, height = 800)
+print(p)
+dev.off()
+
+p <- ggplot(tw, aes(x = richfactor, y = Description, color = Pvalue_corrected, size = Number)) +
+  geom_point(alpha = 1) +
+  # scale_color_gradient(low = "black", high = "red") +
   theme(
     legend.position = "right",
     axis.text = element_text(
@@ -79,30 +111,15 @@ ggplot(tw, aes(x = richfactor, y = Description)) +
   labs(size = "Number of Genes", colour = "FDR") +
   ylab(NULL) + xlab("Rich Factor")
 
-#guides(fill = guide_legend(title = c("FDR", "number genes")))
-#theme(
-#  plot.title = element_text(color = "red", size = 14, face = "bold.italic"),
-#  axis.title.x = element_text(color = "blue", size = 14, face = "bold"),
-#  axis.title.y = element_text(color = "#993333", size = 14, face = "bold")
-#)
+pdf("bubble.pdf", width = 10, height = 10)
 
-# color
-# Default version: just say color=your numeric column
-ggplot(mtcars, aes(x = wt, y = mpg, color = disp)) + geom_point(size = 4)
+print(p)
 
-# 1 - Scale_fill_gradient
-ggplot(mtcars, aes(x = wt, y = mpg, color = disp)) + geom_point(size = 5) +
-  scale_color_gradient(low = "black", high = "red")
+dev.off()
 
-# 2 - Three colours gradient
-ggplot(mtcars, aes(x = wt, y = mpg, color = disp)) + geom_point(size = 5) +
-  scale_fill_gradient2(midpoint = 3)
+# CLEAN DATA
+rm(list = ls(all.names = T))
 
-# 3 - scale_colour_gradientn() and scale_fill_gradientn(): a custom n-colour gradient.
-# Also works with cm.colors, heat.colors, and the colors of the package "colorspace"
-ggplot(mtcars, aes(x = wt, y = mpg, color = disp)) + geom_point(size = 5) +
-  scale_color_gradientn(colours = terrain.colors(7))
+# clean image
 
-# 4 - Using R colorbrewer
-ggplot(mtcars, aes(x = wt, y = mpg, color = disp)) + geom_point(size = 5) +
-  scale_color_distiller(palette = "RdPu")
+graphics.off()
