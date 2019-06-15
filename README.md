@@ -46,6 +46,50 @@ Required packages can be installed with following R codes for Linux:
 ```
 
 ## Some examples
+### MA Plot
+```r
+#require
+library(tidyverse)
+library(DESeq2)
+library(RColorBrewer)
+color <- grDevices::colors()[grep("gr(a|e)y", grDevices::colors(), invert = T)]
+rcolor <- color[sample(1:length(color), length(color))]
+
+myWO<- read.csv("WT_KO_count.csv",header = T,row.names = "ensgene")
+metWO<- read.csv("WT_KO.csv",header = T,row.names = "name")
+
+all(rownames(metWO) %in% colnames(myWO))
+
+all(rownames(metWO) == colnames(myWO))
+
+dds <- DESeqDataSetFromMatrix(countData = myWO,
+                              colData = metWO,
+                              design = ~ dex)
+dds
+dds <- DESeq(dds)
+
+res <- results(dds, tidy=TRUE)
+res <- tbl_df(res)
+res
+# Create the new column
+res <- res %>% mutate(sig=padj<0.05)
+
+# How many of each?
+res %>% 
+  group_by(sig) %>% 
+  summarize(n=n())
+
+res %>% 
+  filter(!is.na(log2FoldChange)) %>% 
+  ggplot(aes(baseMean, log2FoldChange, col=sig)) + 
+  geom_point() + 
+  scale_fill_manual(values = rcolor[c(1:3)])+
+  scale_color_manual(values = rcolor[c(1:3)])+
+  scale_x_log10() + 
+  ggtitle("MA plot")
+
+```
+<img src="Fig/maplot.png" width="80%" alt="npg">
 
 ### volcano plot
 ```r
