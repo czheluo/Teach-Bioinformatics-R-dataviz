@@ -48,29 +48,33 @@ Required packages can be installed with following R codes for Linux:
 ## Some examples
 ### MA Plot
 ```r
-#require
+# require
 library(tidyverse)
 library(DESeq2)
 library(RColorBrewer)
 color <- grDevices::colors()[grep("gr(a|e)y", grDevices::colors(), invert = T)]
 rcolor <- color[sample(1:length(color), length(color))]
 
-myWO<- read.csv("WT_KO_count.csv",header = T,row.names = "ensgene")
-metWO<- read.csv("WT_KO.csv",header = T,row.names = "name")
+myWO <- read.csv("WT_KO_count.csv", header = T, row.names = "ensgene")
+metWO <- read.csv("WT_KO.csv", header = T, row.names = "name")
 
 all(rownames(metWO) %in% colnames(myWO))
 
 all(rownames(metWO) == colnames(myWO))
 
-dds <- DESeqDataSetFromMatrix(countData = myWO,
-                              colData = metWO,
-                              design = ~ dex)
+dds <- DESeqDataSetFromMatrix(
+  countData = myWO,
+  colData = metWO,
+  design = ~dex
+)
 dds
+
 dds <- DESeq(dds)
 
-res <- results(dds, tidy=TRUE)
+res <- results(dds, tidy = TRUE)
 res <- tbl_df(res)
 res
+
 # Create the new column
 res <- res %>% mutate(sig=padj<0.05)
 
