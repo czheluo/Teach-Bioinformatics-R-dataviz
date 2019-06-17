@@ -248,7 +248,7 @@ for (i in 1:7) {
   )
 }
 ```
-<img src="Fig/circos.png" width="70%" alt="venn">
+<img src="Fig/circos.png" width="80%" alt="venn">
 
 ## Supervenn
 ```r
@@ -299,7 +299,7 @@ showSVG(myV4, opacity = 0.8, systemShow = T)
 
 
 ```
-<img src="Fig/venn.png" width="70%" alt="venn">
-<img src="Fig/upset.png" width="70%" alt="venn">
-<img src="Fig/mnVR.png" width="70%" alt="venn">
+<img src="Fig/venn.png" width="80%" alt="venn">
+<img src="Fig/upset.png" width="80%" alt="venn">
+<img src="Fig/mnVR.png" width="80%" alt="venn">
 
