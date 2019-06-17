@@ -46,6 +46,7 @@ Required packages can be installed with following R codes for Linux:
 ```
 
 ## Some examples
+
 ### MA Plot
 ```r
 # require
@@ -82,7 +83,7 @@ res <- res %>% mutate(sig=padj<0.05)
 res %>% 
   group_by(sig) %>% 
   summarize(n=n())
-
+  
 res %>% 
   filter(!is.na(log2FoldChange)) %>% 
   ggplot(aes(baseMean, log2FoldChange, col=sig)) + 
@@ -93,6 +94,7 @@ res %>%
   ggtitle("MA plot")
 
 ```
+
 <img src="Fig/maplot.png" width="80%" alt="npg">
 
 ### volcano plot
