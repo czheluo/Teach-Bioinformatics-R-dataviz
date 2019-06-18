@@ -25,7 +25,7 @@
 
 # Installation
  
-**Required packages** can be installed on Windows, Linux and MacOS(NO TRAYING) with following steps:
+**Required packages** can be installed on Windows, Linux and MacOS with following steps:
 
 **installation for newest R packages**
 Required packages can be installed with following R codes for Windows:  
