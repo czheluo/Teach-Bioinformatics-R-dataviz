@@ -11,10 +11,10 @@
 
 | Topic | Time | Day|
 | :---: | :---: | :---: |
-| Introduction to Linux/Perl for bioinformatics | 08:30 - 12:00 | 06.13
-| Data Science visualization (R DataViz) | 13:30 - 17:30 | 06.13
-| Transcriptome analysis procedure I (QC, Assembly(noref), Mapping and RSEM) | 08:30 - 12:00 | 06.14
-| Transcriptome analysis procedure II (DE (edgeR), PCA and (GO, KEGG) set analysis)  | 13:30 - 17:30 | 06.14
+| Introduction to Linux/Perl for bioinformatics | 08:30 - 12:00 | 06.13 && 08.13
+| Data Science visualization (R DataViz) | 13:30 - 17:30 | 06.13 && 08.13
+| Transcriptome analysis procedure I (QC, Assembly(noref), Mapping and RSEM) | 08:30 - 12:00 | 06.14 && 08.14
+| Transcriptome analysis procedure II (DE (edgeR), PCA and (GO, KEGG) set analysis)  | 13:30 - 17:30 | 06.14 && 08.14
 
 ### Pipeline (Reference)
 
