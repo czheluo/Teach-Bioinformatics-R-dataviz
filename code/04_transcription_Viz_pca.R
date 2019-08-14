@@ -52,7 +52,7 @@ p
 # add label text
 p <- ggplot(human.pca.out, aes(x = PC1, y = PC2, color = group, label = row.names(human.pca.out)))
 p <- p + geom_point(size = 4) + 
-  geom_text(size = 3,position = position_nudge(y=2,x=-2)) + theme
+  geom_text(size = 3,position = position_nudge(y=2,x=-2)) + theme ## or  use vjust and hjust 
 p
 # explation
 
