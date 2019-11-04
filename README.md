@@ -303,3 +303,153 @@ showSVG(myV4, opacity = 0.8, systemShow = T)
 <img src="Fig/upset.png" width="80%" alt="venn">
 <img src="Fig/mnVR.png" width="80%" alt="venn">
 
+
+## Network
+```r
+# load packages
+library(vegan)
+library(igraph)
+library(Hmisc)
+
+coRnetwork <- function(matrix, cor.cutoff, p.cutoff) {
+  # load packages
+  library(vegan)
+  library(igraph)
+  library(Hmisc)
+  
+  matrix1 <- matrix
+  matrix1[matrix1 > 0] <- 1
+
+  # correlation analysis based on spearman's or pearson co-efficient
+  matrix.dist <- rcorr(t(matrix), type = "spearman")
+  # matrix.dist<-rcorr(t(matrix),type="pearson")
+  matrix.cor <- matrix.dist$r
+  matrix.cor.p <- matrix.dist$P
+
+
+  # Multiple testing correction using Benjamini-Hochberg standard false discovery rate correction
+  matrix.cor.p <- p.adjust(matrix.cor.p, method = "BH")
+
+  # Consider positive cooccurence at given coefficient (cor.cutoff) and p-value cutoffs
+  matrix.cor1 <- matrix.cor
+  matrix.cor1.p <- matrix.cor.p
+  matrix.cor1[which(matrix.cor1 <= cor.cutoff)] <- 0
+  matrix.cor1[which(matrix.cor1.p > p.cutoff)] <- 0
+  # delete those rows and columns with sum = 0
+  matrix.cor1 <- matrix.cor1[which(rowSums(matrix.cor1) != 1), ]
+  matrix.cor1 <- matrix.cor1[, which(colSums(matrix.cor1) != 0)]
+
+  # Consider netagive cooccurence at given coefficient (-cor.cutoff) and p-value cutoffs
+  matrix.cor2 <- matrix.cor
+  matrix.cor2.p <- matrix.cor.p
+  matrix.cor2[which(matrix.cor2 > (-cor.cutoff))] <- 0
+  matrix.cor2[which(matrix.cor2.p > p.cutoff)] <- 0
+  # delete those rows and columns with sum = 0
+  matrix.cor2 <- matrix.cor2[which(rowSums(matrix.cor2) != 0), ]
+  matrix.cor2 <- matrix.cor2[, which(colSums(matrix.cor2) != 0)]
+
+  # Consider both positive and netagive cooccurence at given coefficient (cor.cutoff) and p-value cutoffs
+  matrix.cor3 <- matrix.cor
+  matrix.cor3.p <- matrix.cor.p
+  matrix.cor3[which(matrix.cor3 >= (-cor.cutoff) & matrix.cor3 <= cor.cutoff)] <- 0
+  matrix.cor3[which(matrix.cor3.p > p.cutoff)] <- 0
+
+  # delete those rows and columns with sum = 0
+  matrix.cor3 <- matrix.cor3[which(rowSums(matrix.cor3) != 1), ]
+  matrix.cor3 <- matrix.cor3[, which(colSums(matrix.cor3) != 0)]
+
+  # get pairs r
+  # This is to remove redundancy as upper correlation matrix == lower
+  ma1 <- matrix.cor1
+  ma2 <- matrix.cor2
+  ma3 <- matrix.cor3
+  ma1[upper.tri(matrix.cor1, diag = TRUE)] <- NA
+  pair.r1 <- reshape2::melt(ma1, na.rm = TRUE, value.name = "cor")
+  ma2[upper.tri(ma2, diag = TRUE)] <- NA
+  pair.r2 <- reshape2::melt(ma2, na.rm = TRUE, value.name = "cor")
+  ma3[upper.tri(ma3, diag = TRUE)] <- NA
+  pair.r3 <- reshape2::melt(ma3, na.rm = TRUE, value.name = "cor")
+  pair.r1<-pair.r1[which(pair.r1[,3]!=0),]
+  pair.r2<-pair.r2[which(pair.r2[,3]!=0),]
+  pair.r3<-pair.r3[which(pair.r3[,3]!=0),]
+  write.csv(pair.r1, file = "Pos_otu.csv",quote = F, row.names = F)
+  write.csv(pair.r2, file = "Neg_otu.csv",quote = F,row.names = F)
+  write.csv(pair.r3, file = "PosNeg_otu.csv",quote = F,row.names = F)
+
+  # generating graph using igraph
+  g1 <- graph.adjacency(matrix.cor1, weight = T, mode = "undirected")
+  g1 <- simplify(g1)
+  V(g1)$label <- V(g1)$name
+  V(g1)$degree <- degree(g1)
+
+  g2 <- graph.adjacency(matrix.cor2, weight = T, mode = "undirected")
+  g2 <- simplify(g2)
+  V(g2)$label <- V(g2)$name
+  V(g2)$degree <- degree(g2)
+
+  g3 <- graph.adjacency(matrix.cor3, weight = T, mode = "undirected")
+  g3 <- simplify(g3)
+  V(g3)$label <- V(g3)$name
+  V(g3)$degree <- degree(g3)
+
+  # append the output into results
+  result <- list()
+  result$matrix.cor <- matrix.cor
+  result$matrix.cor.p <- matrix.cor.p
+
+  result$matrix.cor1 <- matrix.cor1
+  result$graph1 <- g1
+
+  result$matrix.cor2 <- matrix.cor2
+  result$graph2 <- g2
+
+  result$matrix.cor3 <- matrix.cor3
+  result$graph3 <- g3
+  return(result)
+}
+
+#install.packages("gtools")
+library(gtools)
+f <- foldchange(Abu[,1],Abu[,14])
+cbind(Abu[,1],Abu[,14],a,b,f)
+
+# Co-occurrence-network-analysis
+## OTU filtering, network generation, topological analysis and export OTU table
+library(igraph)
+library(Hmisc)
+
+setwd("director/path")
+
+Abu <- read.table("oturelative.txt", header = T)
+Abu <- read.table("otuabu.txt", header = T)
+Abu <- as.matrix(Abu)
+
+### Filtering OTUs
+table <- Abu
+table[table > 0] <- 1
+table.generalist <- Abu[which(rowSums(table) >= 12), ]
+Abu <- table.generalist
+
+## Creating gml files of network (to be visulized in Gephi or Cytoscape)
+
+## cutoffs for correlation coefficient and P-value
+pattern <- coRnetwork(Abu, 0.6, 0.01)
+
+#write.graph(pattern$graph1, "Pos0.6-rela.gml", format = "gml") # network file for positive association
+#write.graph(pattern$graph2, "Neg0.6-rela.gml", format = "gml") # network file for negative association
+#write.graph(pattern$graph3, "PosNeg0.6-rela.gml", format = "gml") # network file for all association
+
+write.graph(pattern$graph1, "Pos0.6-abu.gml", format = "gml") # network file for positive association
+write.graph(pattern$graph2, "Neg0.6-abu.gml", format = "gml") # network file for negative association
+write.graph(pattern$graph3, "PosNeg0.6-abu.gml", format = "gml") # network file for all association
+
+```
+### gephi
+
+<img src="network/abu_all.png" width="80%" alt="venn">
+
+### Cytoscape
+
+<img src="network/PosNeg_otu.csv.jpg" width="80%" alt="venn">
+
+
