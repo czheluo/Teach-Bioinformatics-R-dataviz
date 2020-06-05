@@ -20,7 +20,8 @@ library(dplyr)
 
 ################## set workdir ###############################
 
-#setwd("D:\\R\\BSA")
+#setwd("D:\\BSA\\BSA")
+
 vcf <- read.vcfR("pop.no.vcf.gz")
 
 ltable <- data.frame(CHROM = getCHROM(vcf),
@@ -41,9 +42,9 @@ LP<-"ZH30"
 
 ltable<-ltable %>%
     separate(col = LB,
-                    into = c(paste("AD_REF.",LB,sep = ""),
-                             paste("AD_ALT.",LB,sep = "")),
-                    sep = ",",convert = TRUE)
+            into = c(paste("AD_REF.",LB,sep = ""),
+                    paste("AD_ALT.",LB,sep = "")),
+            sep = ",",convert = TRUE)
 
 #HighBulk
 HB<-"GC-bulk"
@@ -53,6 +54,7 @@ ltable<-ltable %>%
                     into = c(paste("AD_REF.",HB,sep = ""),
                              paste("AD_ALT.",HB,sep = "")),
                     sep = ",",convert = TRUE)#tidyr::
+
 
 
 ##filter markers
@@ -66,6 +68,8 @@ ltable <-ltable %>%
 	mutate(REF_FRQ = (`AD_REF.GC-bulk` + `AD_REF.YC-bulk`) / (`AD_ALT.GC-bulk` + `AD_ALT.YC-bulk`
 	+`AD_REF.GC-bulk` + `AD_REF.YC-bulk`))
 
+
+
 table_filter<- filter(ltable, (`AD_REF.GC-bulk` +`AD_ALT.GC-bulk`+
                                           `AD_REF.YC-bulk`+`AD_ALT.YC-bulk`) >=
                                 30)#dplyr::
@@ -77,14 +81,14 @@ table_filter<- filter(ltable, (`AD_REF.GC-bulk` +`AD_ALT.GC-bulk`+
 table_filter <- filter(table_filter, table_filter$REF_FRQ > 0.3)
 
 
-
+load("tablefilter.RData")
 
 write.table(table_filter, file = "soybeanF2.txt", sep = "\t", row.names = F, quote = F)
 
 table <- importFromTable("soybeanF2.txt",
                       highBulk = HB,
                       lowBulk = LB,
-                      chromList = unique(ltable$CHROM),
+                      chromList = unique(table_filter$CHROM),
                       sep = "\t")
 
 
@@ -105,7 +109,8 @@ plotQTLStats(
     plotThreshold = TRUE,
     q = 0.001
 )
-getQTLTable(SNPset = Gstat, alpha = 0.01, export = TRUE, fileName = "Gstat_QTL.csv")
+
+getQTLTable(SNPset = QTLseq_G, alpha = 0.01, export = TRUE, fileName = "Gstat_QTL.csv")
 
 ### QTL-seq ###
 
@@ -141,6 +146,7 @@ Chr <- as.numeric(ch)
 result <- data.frame(SNP,Chr,QTLseq_G$POS,QTLseq_G$Gprime,
                      QTLseq_G$tricubeDeltaSNP,QTLseq_G$CI_99)
 
+
 getFDRThreshold <- function(pvalues, alpha = 0.01,method="BH"){
     sortedPvals <- sort(pvalues, decreasing = FALSE)
     pAdj <- p.adjust(sortedPvals, method = method)
@@ -153,7 +159,7 @@ getFDRThreshold <- function(pvalues, alpha = 0.01,method="BH"){
 }
 
 
-fdrT <- getFDRThreshold(QTLseq_G$pvalue, alpha = 0.05)
+fdrT <- getFDRThreshold(QTLseq_G$pvalue, alpha = 0.01)
 
 GprimeT <- QTLseq_G[which(QTLseq_G$pvalue == fdrT),"Gprime"]
 
@@ -163,7 +169,9 @@ CMplot(result[,c(1,2,3,4)], plot.type="m", LOG10=FALSE, cex.lab=2,ylab = NULL,
        ylim=c(round(min(result[,4]),digits=1),round(max(result[,4]),digits=1)),
        amplify=FALSE,main="G' value",chr.labels=NULL,
        threshold=GprimeT,threshold.lty=2,threshold.lwd=2, threshold.col="black",
-       bin.size=1e6,type="l",multracks=FALSE,file.output=TRUE)#type="p"
+       bin.size=1e6,type="p",multracks=FALSE,file.output=TRUE)#type="p"
+
+
 
 CMplot(result[,c(1,2,3,4)], plot.type="m", LOG10=FALSE, cex.lab=2,ylab = NULL,
        ylim=c(round(min(result[,4]),digits=1),round(max(result[,4]),digits=1)),
@@ -199,10 +207,13 @@ CMplot(result[,c(1:5)],type="p",plot.type="c",chr.labels=paste("Chr",c(1:20),sep
 
 CMplot(result[,c(1:5)],type="p",plot.type="c",chr.labels=paste("Chr",c(1:20),sep=""),
        r=0.4,cir.legend=TRUE,outward=FALSE,cir.legend.col="black",LOG10=FALSE,
-       cir.chr.h=1.3,ylab = NULL,file="jpg",#“jpg”, “pdf”, “tiff”
+       cir.chr.h=1.3,ylab = NULL,file="jpg",#"jpg", "pdf", "tiff"
        memo="",dpi=300,file.output=TRUE,verbose=TRUE,width=10,height=10,
        chr.den.col=c("darkgreen","yellow","red"),
        bin.size=1e6)
+
+
+
 
 #png(paste("G",".png",sep=""),width=1000, height=800)
 #dev.off()
